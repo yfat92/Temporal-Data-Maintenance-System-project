@@ -80,6 +80,35 @@ def update (update_date, updat_time, comp_or_loinc, first_name, last_name, new_d
     :param new_value: The updated value
     :return: the updated row. if no row updated return null
     """
+    import datetime as datetime
+    datetime_start_str = update_date + " " + updat_time
+    datetime_start_obj = datetime.datetime.strptime(datetime_start_str, '%d/%m/%Y %H:%M:%S')
+    tmp_db = db_project_df.loc[(db_project_df['Valid start time'] == datetime_start_obj) &
+                               (db_project_df['Valid stop time'] == last_name) & (db_project_df['First name'] == first_name)]
+    if tmp_db is None:
+        return None
+    #more then one row
+    if tmp_db.shape[0] > 1:
+        row_to_update = tmp_db.sort_values(by="Transaction time", ascending=False).head(1)
+        old_value = row_to_update.copy()
+    #only one row return
+    else :
+        row_to_update = tmp_db
+    if comp_or_loinc == 1:
+        row_to_update["LOINC-NUM"] = new_value
+    else:
+        row_to_update["COMPONENT"] = new_value
+
+    datetime_new_str = new_date + " " + new_time
+    datetime_new_obj = datetime.datetime.strptime(datetime_new_str, '%d/%m/%Y %H:%M:%S')
+    row_to_update["Valid start time"] = datetime_new_obj
+    row_to_update["Valid stop time"] = datetime_new_obj
+    row_to_update["Transaction time"] = datetime_new_obj
+    db_project_df.append(row_to_update)
+    return [row_to_update,old_value]
+
+
+
 
 
 
