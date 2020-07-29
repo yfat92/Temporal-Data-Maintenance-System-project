@@ -14,6 +14,28 @@ def merge_project_files(Lonic, db):
     result = pd.merge(Lonic, db,how='right',  right_on='LOINC-NUM',left_on="LOINC_NUM")
     return  result
 
+def replase_project_files(db, path,lonic):
+    """
+
+    :param db: pandas datefrane
+    :param path: path of the new data
+    :param lonic: andas datefrane
+    :return:
+    """
+    if path is not None:
+        df = pd.read_csv(path)
+        result = merge_project_files(df,db)
+    else:
+        result = merge_project_files(lonic, db)
+
+    return result
+
+def add_data(path, data_to_add):
+    global db_project_df
+    df_loinc = pd.read_csv(os.path.join(path, "Loinc.csv"))
+    df_loinc = df_loinc.append(data_to_add)
+    df_loinc.to_csv("Data/new_lonci.csv")
+    return df_loinc
 
 def retrieve(first_name, last_name, transac_date,transac_time, start_date, start_time, comp_or_loinc):
     """
@@ -93,7 +115,7 @@ def history(logic_num, first_name, last_name,transac_date,transac_time, start_da
     return tmp_db
 
 
-def update (update_date, updat_time, comp_or_loinc, first_name, last_name, new_date, new_time, new_value):
+def update (update_date, updat_time, comp_or_loinc_val, first_name, last_name, new_date, new_time, new_value):
     """
 
     :param update_date: the date we will update
@@ -112,7 +134,9 @@ def update (update_date, updat_time, comp_or_loinc, first_name, last_name, new_d
     datetime_start_obj = datetime.datetime.strptime(datetime_start_str, '%d/%m/%Y %H:%M:%S')
     tmp_db = db_project_df.loc[(db_project_df['Valid start time'] == datetime_start_obj) &
                                (db_project_df['First name'] == first_name) &
-                               (db_project_df['Last name'] == last_name)]
+                               (db_project_df['Last name'] == last_name) &
+                               ((db_project_df['LOINC-NUM'] == comp_or_loinc_val) | (db_project_df['COMPONENT'] == comp_or_loinc_val))
+                               ]
     if tmp_db.empty:
         return None
     #more then one row
@@ -122,10 +146,8 @@ def update (update_date, updat_time, comp_or_loinc, first_name, last_name, new_d
     #only one row return
     else :
         row_to_update = tmp_db
-    if comp_or_loinc == 1:
-        row_to_update["LOINC-NUM"] = new_value
-    else:
-        row_to_update["COMPONENT"] = new_value
+
+    row_to_update["Value"] = new_value
 
     datetime_new_str = new_date + " " + new_time
     datetime_new_obj = datetime.datetime.strptime(datetime_new_str, '%d/%m/%Y %H:%M:%S')
@@ -144,7 +166,8 @@ def delete(tran_date, tran_time, comp_or_loinc, first_name, last_name, del_date,
     datetime_start_obj = datetime.datetime.strptime(datetime_start_str, '%d/%m/%Y %H:%M:%S')
     tmp_db = db_project_df.loc[(db_project_df['Valid start time'] <= datetime_start_obj) &
                                (db_project_df['First name'] == first_name) &
-                               (db_project_df['Last name'] == last_name)]
+                               (db_project_df['Last name'] == last_name) &
+                               (db_project_df["LOINC-NUM"] == comp_or_loinc | db_project_df["COMPONENT"] == comp_or_loinc)]
 
     if tmp_db.empty:
         return None
@@ -155,10 +178,7 @@ def delete(tran_date, tran_time, comp_or_loinc, first_name, last_name, del_date,
     #only one row return
     else :
         row_to_update = tmp_db
-    if comp_or_loinc == 1:
-        row_to_update["LOINC-NUM"] = None
-    else:
-        row_to_update["COMPONENT"] = None
+    row_to_update["Value"] = None
 
     datetime_new_str = tran_date + " " + tran_time
     datetime_new_obj = datetime.datetime.strptime(datetime_new_str, '%d/%m/%Y %H:%M:%S')
