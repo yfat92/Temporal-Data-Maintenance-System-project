@@ -12,7 +12,7 @@ def merge_project_files(Lonic, db):
     """
 
     result = pd.merge(Lonic, db,how='right',  right_on='LOINC-NUM',left_on="LOINC_NUM")
-    return  result
+    return result
 
 def replase_project_files(db, path,lonic):
     """
@@ -66,7 +66,7 @@ def retrieve(first_name, last_name, transac_date,transac_time, start_date, start
     if res is not None:
         if res.shape[0] > 1:
             res = res.sort_values(by="Valid start time", ascending=False).head(1)
-        if comp_or_loinc:
+        if comp_or_loinc == 'comp':
             return [res["COMPONENT"], res]
         else:
             return [res["LOINC-NUM"], res]
