@@ -30,9 +30,9 @@ def replase_project_files(db, path,lonic):
 
     return result
 
-def add_data(path, data_to_add):
+def add_data(data_to_add):
     global db_project_df
-    df_loinc = pd.read_csv(os.path.join(path, "Loinc.csv"))
+    df_loinc = pd.read_csv(os.path.join("Data/Lonic.csv"))
     df_loinc = df_loinc.append(data_to_add)
     df_loinc.to_csv("Data/new_lonci.csv")
     return df_loinc
