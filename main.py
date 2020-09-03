@@ -34,7 +34,7 @@ while(run):
 
     if userInp == '1':
         date = input('Enter current date in the following format %d-%m-%y:')
-        date = datetime.datetime.strptime(date, '%d-%m-%y').date()
+        date = datetime.datetime.strptime(date, '%d/%m/%Y %H:%M:%S')
         print('Current date is :' + str(date))
 
     elif userInp == '2':
@@ -73,6 +73,7 @@ while(run):
         if end_time == '':
             end_time = None
         ans = merge.history(logic_num, first_name, last_name,transac_date,transac_time, start_date, end_date, start_time, end_time)
+        print(ans)
 
 
     elif userInp == '4':
@@ -118,7 +119,7 @@ while(run):
 
     elif userInp == '7':
         path = input('Enter new file path:')
-        df = pd.read_csv(path)
+        df = pd.read_excel(path)
         ans = merge.add_data(df)
     else:
         error= ''

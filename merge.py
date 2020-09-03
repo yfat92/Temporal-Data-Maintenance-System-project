@@ -11,7 +11,7 @@ def merge_project_files(Lonic, db):
     :return: merge pandas dataframe
     """
 
-    result = pd.merge(Lonic, db,how='right',  right_on='LOINC-NUM',left_on="LOINC_NUM")
+    result = pd.merge(Lonic, db, how='right',  right_on='LOINC-NUM',left_on="LOINC_NUM")
     return result
 
 def replase_project_files(db, path,lonic):
@@ -23,18 +23,18 @@ def replase_project_files(db, path,lonic):
     :return:
     """
     if path is not None:
-        df = pd.read_csv(path)
-        result = merge_project_files(df,db)
+        df = pd.read_excel(path)
+        result = merge_project_files(lonic,df)
     else:
         result = merge_project_files(lonic, db)
-
+    result.to_excel("Data/project_db_test_publish.xlsx")
     return result
 
 def add_data(data_to_add):
     global db_project_df
-    df_loinc = pd.read_csv(os.path.join("Data/Lonic.csv"))
+    df_loinc = pd.read_excel(os.path.join("Data/project_db_test_publish.xlsx"))
     df_loinc = df_loinc.append(data_to_add)
-    df_loinc.to_csv("Data/new_lonci.csv")
+    df_loinc.to_excel("Data/project_db_test_publish.xlsx")
     return df_loinc
 
 def retrieve(first_name, last_name, transac_date,transac_time, start_date, start_time, comp_or_loinc):
@@ -60,7 +60,7 @@ def retrieve(first_name, last_name, transac_date,transac_time, start_date, start
         start_time = "00:00:01"
     datetime_start_str = start_date + " " + start_time
     datetime_start_object = datetime.datetime.strptime(datetime_start_str, '%d/%m/%Y %H:%M:%S')
-    res = res.loc[(db_project_df['Valid start time'] <= datetime_start_object)]
+    res = res.loc[(db_project_df['Valid start time'] >= datetime_start_object)]
 
 
     if res is not None:
