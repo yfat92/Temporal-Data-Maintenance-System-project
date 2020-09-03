@@ -127,4 +127,3 @@ while(run):
         elif(not cond2):
             error = "Error: data generated but least squares not completed"
         print(error)
-
