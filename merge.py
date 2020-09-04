@@ -65,10 +65,10 @@ class Merge():
                           & (self.db_project_df['Transaction time'] <= datetime_object)]
 
         if start_time is None:
-            start_time = "00:00:01"
+            start_time = "23:59:59"
         datetime_start_str = start_date + " " + start_time
         datetime_start_object = datetime.datetime.strptime(datetime_start_str, '%d/%m/%Y %H:%M:%S')
-        res = res[res['Valid start time'] >= datetime_start_object]
+        res = res[datetime_start_object >= res['Valid start time']]
 
         if comp_or_loinc == 'comp':
             res = res.loc[res['COMPONENT'] == lonic_comp_val]
@@ -168,22 +168,35 @@ class Merge():
     def delete(self, tran_date, tran_time, comp_or_loinc, first_name, last_name, del_date, del_time):
         import datetime as datetime
 
-        datetime_start_str = del_date + " " + del_time
+        datetime_start_str = tran_date + " " + tran_time
         datetime_start_obj = datetime.datetime.strptime(datetime_start_str, '%d/%m/%Y %H:%M:%S')
-        tmp_db = db_project_df.loc[(self.db_project_df['Valid start time'] <= datetime_start_obj) &
-                                   (self.db_project_df['First name'] == first_name) &
-                                   (self.db_project_df['Last name'] == last_name) &
-                                   (self.db_project_df["LOINC-NUM"] == comp_or_loinc | self.db_project_df["COMPONENT"] == comp_or_loinc)]
+        tmp_db = self.db_project_df.loc[(self.db_project_df['Transaction time'] <= datetime_start_obj) &
+                                  (self.db_project_df['First name'] == first_name) &
+                                  (self.db_project_df['Last name'] == last_name) &
+                                   ((self.db_project_df["LOINC-NUM"] == comp_or_loinc) | (self.db_project_df["COMPONENT"] == comp_or_loinc))]
+        if del_time:
+            datetime_del_str = del_date + " " + del_time
+            datetime_del_obj = datetime.datetime.strptime(datetime_del_str, '%d/%m/%Y %H:%M:%S')
+            tmp_db = tmp_db[(tmp_db['Valid start time'] == datetime_del_obj)]
+
+        else:
+            datetime_del_start_str = del_date + ' 00:00:00'
+            datetime_del_start_obj = datetime.datetime.strptime(datetime_del_start_str, '%d/%m/%Y %H:%M:%S')
+            datetime_del_end_str = del_date + ' 23:59:59'
+            datetime_del_end_obj = datetime.datetime.strptime(datetime_del_end_str, '%d/%m/%Y %H:%M:%S')
+            tmp_db = tmp_db[(tmp_db['Valid start time'] >= datetime_del_start_obj) & (tmp_db['Valid start time'] <= datetime_del_end_obj)]
+
 
         if tmp_db.empty:
             return None
         #more then one row
         if tmp_db.shape[0] > 1:
-            row_to_update = tmp_db.sort_values(by="Transaction time", ascending=False).head(1).copy()
+            row_to_update = tmp_db.sort_values(by=["Transaction time", "Valid start time"], ascending=False).head(1).copy()
             old_value = row_to_update.copy()
         #only one row return
         else :
             row_to_update = tmp_db
+            old_value = row_to_update.copy()
         row_to_update["Value"] = None
 
         datetime_new_str = tran_date + " " + tran_time

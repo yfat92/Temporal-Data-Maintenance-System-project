@@ -100,21 +100,21 @@ while(run):
 
     elif userInp == '5':
         tran_date = input('Enter transaction date:')
-        tran_time = input('Enter transaction time (optional):')
-        if tran_time == '':
-            tran_time = None
+        tran_time = input('Enter transaction time:')
         comp_or_loinc_val = input('Enter comp or lonic name:')
         first_name = input('Enter first_name:')
         last_name = input('Enter last_name:')
         del_date = input('Enter del date:')
-        del_time = input('Enter del time:')
-        ans = merge_c.delete(tran_date, tran_time, comp_or_loinc, first_name, last_name, del_date, del_time)
+        del_time = input('Enter del time (optional) :')
+        if del_time == '':
+            del_time = None
+        ans = merge_c.delete(tran_date, tran_time, comp_or_loinc_val, first_name, last_name, del_date, del_time)
         if ans is None:
             print('There is no measurement that matches the publication of The query')
         else:
             print('The update was done')
             print(ans[0].to_string())
-
+            print(ans[1].to_string())
     elif userInp == '6':
         path = input('Enter new file path:')
         ans = merge_c.replase_project_files(merge.db_project_df, path ,df_loinc)
