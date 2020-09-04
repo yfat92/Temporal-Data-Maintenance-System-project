@@ -27,9 +27,9 @@ class Merge():
         """
         if path is not None:
             df = pd.read_excel(path)
-            result = merge_project_files(lonic,df)
+            result = self.merge_project_files(lonic,df)
         else:
-            result = merge_project_files(lonic, db)
+            result = self.merge_project_files(lonic, db)
         result.to_excel("Data/project_db_test_publish.xlsx")
         return result
 
@@ -199,7 +199,7 @@ class Merge():
         df_loinc = pd.read_csv(os.path.join(path, "Loinc.csv") )
 
         db_df = pd.read_excel(os.path.join(path, "project_db_test_publish.xlsx") )
-        db_project_df = merge_project_files(df_loinc, db_df)
+        db_project_df = self.merge_project_files(df_loinc, db_df)
         db_project_df["Valid start time"] = pd.to_datetime(db_project_df["Valid start time"])
         db_project_df["Valid stop time"] = pd.to_datetime(db_project_df["Valid stop time"])
         db_project_df["Transaction time"] = pd.to_datetime(db_project_df["Transaction time"])
