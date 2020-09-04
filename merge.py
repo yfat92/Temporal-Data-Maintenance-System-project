@@ -83,7 +83,6 @@ class Merge():
 
 
 
-
     def history(self, logic_num, first_name, last_name,transac_date,transac_time, start_date, end_date, start_time, end_time):
         """
 

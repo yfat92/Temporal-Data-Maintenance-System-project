@@ -56,6 +56,7 @@ while(run):
         ans = merge_c.retrieve(first_name, last_name, transac_date,transac_time, start_date, start_time, comp_or_loinc,comp_or_loinc_val)
         print(ans.to_string())
 
+
     elif userInp == '3':
         logic_num = input('Enter logic_num:')
         first_name = input('Enter first_name:')
