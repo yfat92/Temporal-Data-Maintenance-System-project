@@ -51,7 +51,8 @@ while(run):
         if start_time == '':
             start_time = None
         comp_or_loinc = input('Choose "comp" for comp or "lonic" for lonic:')
-        ans = merge.retrieve(first_name, last_name, transac_date,transac_time, start_date, start_time, comp_or_loinc)
+        comp_or_loinc_val = input('Choose comp or lonic value:')
+        ans = merge.retrieve(first_name, last_name, transac_date,transac_time, start_date, start_time, comp_or_loinc,comp_or_loinc_val)
         print(ans)
 
     elif userInp == '3':
@@ -77,17 +78,15 @@ while(run):
 
 
     elif userInp == '4':
-        update_date = input('Enter current date (optional):')
-        if end_time == '':
-            end_time = date
-        update_time = input('Enter current time (optional):')
+        update_date = input('Enter Valid start date  (optional):')
+        update_time = input('Enter Valid start time (optional):')
         if update_time == '':
             update_time = None
-        comp_or_loinc_val = input('Enter comp or lonic name:')
+        comp_or_loinc_val = input('Enter comp or lonic name cuurent value:')
         first_name = input('Enter first_name:')
         last_name = input('Enter last_name:')
-        new_date = input('Enter new date:')
-        new_time = input('Enter new time:')
+        new_date = input('Enter new date (new Transaction date):')
+        new_time = input('Enter new time (new Transaction time):')
         new_value = input('Enter new value:')
         ans = merge.update (update_date, update_time, comp_or_loinc_val, first_name, last_name, new_date, new_time, new_value)
         if ans is None:
@@ -95,6 +94,7 @@ while(run):
         else:
             print('The update was done')
             print(ans[0])
+            print(ans[1])
 
     elif userInp == '5':
         tran_date = input('Enter transaction date:')

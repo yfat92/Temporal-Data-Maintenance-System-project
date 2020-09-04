@@ -37,7 +37,7 @@ def add_data(data_to_add):
     df_loinc.to_excel("Data/project_db_test_publish.xlsx")
     return df_loinc
 
-def retrieve(first_name, last_name, transac_date,transac_time, start_date, start_time, comp_or_loinc):
+def retrieve(first_name, last_name, transac_date,transac_time, start_date, start_time, comp_or_loinc, lonic_comp_val):
     """
 
     :param first_name: first name of the patient
@@ -62,15 +62,14 @@ def retrieve(first_name, last_name, transac_date,transac_time, start_date, start
     datetime_start_object = datetime.datetime.strptime(datetime_start_str, '%d/%m/%Y %H:%M:%S')
     res = res.loc[(db_project_df['Valid start time'] >= datetime_start_object)]
 
+    if comp_or_loinc == 'comp':
+        res = res.loc[res['COMPONENT'] == lonic_comp_val]
+    else:
+        res = res.loc[res['LOINC-NUM'] == lonic_comp_val]
 
     if res is not None:
         if res.shape[0] > 1:
-            res = res.sort_values(by="Valid start time", ascending=False).head(1)
-        if comp_or_loinc == 'comp':
-            return [res["COMPONENT"], res]
-        else:
-            return [res["LOINC-NUM"], res]
-
+            res = res.sort_values(by=["Transaction time","Valid start time"], ascending=False).head(1)
     return res
 
 
@@ -108,8 +107,9 @@ def history(logic_num, first_name, last_name,transac_date,transac_time, start_da
     datetime_end_obj = datetime.datetime.strptime(datetime_end_str, '%d/%m/%Y %H:%M:%S')
 
     tmp_db = db_project_df.loc[db_project_df['Transaction time'] <= datetime_transaction_obj]
-    tmp_db = tmp_db.loc[(tmp_db['Valid start time'] >= datetime_start_obj) &
-                               (tmp_db['Valid stop time'] <= datetime_end_obj)]
+    # tmp_db = tmp_db.loc[(tmp_db['Valid start time'] >= datetime_start_obj) &
+    #                            (tmp_db['Valid stop time'] <= datetime_end_obj)]
+    tmp_db = tmp_db.loc[(tmp_db['Valid start time'] >= datetime_start_obj)]
     tmp_db = tmp_db.loc[(tmp_db['LOINC-NUM'] == logic_num) & (tmp_db['First name'] == first_name) &
                                (tmp_db['Last name'] == last_name)]
     return tmp_db
@@ -129,7 +129,7 @@ def update (update_date, updat_time, comp_or_loinc_val, first_name, last_name, n
     :return: the updated row. if no row updated return null
     """
     import datetime as datetime
-
+    global db_project_df
     datetime_start_str = update_date + " " + updat_time
     datetime_start_obj = datetime.datetime.strptime(datetime_start_str, '%d/%m/%Y %H:%M:%S')
     tmp_db = db_project_df.loc[(db_project_df['Valid start time'] == datetime_start_obj) &
@@ -146,6 +146,7 @@ def update (update_date, updat_time, comp_or_loinc_val, first_name, last_name, n
     #only one row return
     else :
         row_to_update = tmp_db
+        old_value = row_to_update.copy()
 
     row_to_update["Value"] = new_value
 
@@ -154,7 +155,7 @@ def update (update_date, updat_time, comp_or_loinc_val, first_name, last_name, n
     row_to_update["Valid start time"] = old_value["Valid start time"]
     row_to_update["Valid stop time"] = old_value["Valid stop time"]
     row_to_update["Transaction time"] = datetime_new_obj
-    db_project_df.append(row_to_update)
+    db_project_df = db_project_df.append(row_to_update)
     return [row_to_update,old_value]
 
 
@@ -190,10 +191,20 @@ def delete(tran_date, tran_time, comp_or_loinc, first_name, last_name, del_date,
 def main():
     path = "Data"
     global db_project_df
-    df_loinc = pd.read_csv(os.path.join(path, "Loinc.csv") )
+    db_df = pd.read_excel(os.path.join(path, "project_db_test_publish.xlsx") )
+    df_loinc = pd.read_csv(os.path.join(path, "Lonic.csv") )
+    db_project_df = merge_project_files(df_loinc, db_df)
+    db_project_df["Valid start time"] = pd.to_datetime(db_project_df["Valid start time"])
+    db_project_df["Valid stop time"] = pd.to_datetime(db_project_df["Valid stop time"])
+    db_project_df["Transaction time"] = pd.to_datetime(db_project_df["Transaction time"])
+    res_retive = retrieve("Eli", "Call", "29/05/2018", "14:00:00", "17/05/2018", None, "lonic", "2055-2")
+    print("retrive: ")
+    print(res_retive)
 
+"""
     db_df = pd.read_excel(os.path.join(path, "project_db_test_publish.xlsx") )
     db_project_df = merge_project_files(df_loinc, db_df)
+    
     db_project_df["Valid start time"] = pd.to_datetime(db_project_df["Valid start time"])
     db_project_df["Valid stop time"] = pd.to_datetime(db_project_df["Valid stop time"])
     db_project_df["Transaction time"] = pd.to_datetime(db_project_df["Transaction time"])
@@ -214,6 +225,9 @@ def main():
     print(res_update)
     print("update null")
     print(res_update_null)
+
+"""
+
 
 
 
