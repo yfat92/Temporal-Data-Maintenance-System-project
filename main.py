@@ -92,7 +92,7 @@ while(run):
         new_time = input('Enter new time (new Transaction time):')
         new_value = input('Enter new value:')
         ans = merge_c.update(update_date, update_time, comp_or_loinc_val, first_name, last_name, new_date, new_time, new_value)
-        if ans.empty:
+        if ans is None:
             print('There is no measurement that matches the publication of The query')
         else:
             print('The update was done')
@@ -102,7 +102,7 @@ while(run):
     elif userInp == '5':
         tran_date = input('Enter transaction date:')
         tran_time = input('Enter transaction time:')
-        comp_or_loinc_val = input('Enter comp or lonic name:')
+        comp_or_loinc_val = input('Enter comp or lonic value:')
         first_name = input('Enter first_name:')
         last_name = input('Enter last_name:')
         del_date = input('Enter del date:')
@@ -110,7 +110,7 @@ while(run):
         if del_time == '':
             del_time = None
         ans = merge_c.delete(tran_date, tran_time, comp_or_loinc_val, first_name, last_name, del_date, del_time)
-        if ans.empty:
+        if ans is None:
             print('There is no measurement that matches the publication of The query')
         else:
             print('The update was done')
@@ -118,7 +118,7 @@ while(run):
             print(ans[1].to_string())
     elif userInp == '6':
         path = input('Enter new file path:')
-        ans = merge_c.replase_project_files(merge.db_project_df, path ,df_loinc)
+        ans = merge_c.replase_project_files(merge.db_project_df, path, df_loinc)
 
     elif userInp == '7':
         path = input('Enter new file path:')
