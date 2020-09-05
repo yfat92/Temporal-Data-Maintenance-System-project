@@ -115,7 +115,7 @@ class Merge():
         datetime_start_obj = datetime.datetime.strptime(datetime_start_str, '%d/%m/%Y %H:%M:%S')
         datetime_end_obj = datetime.datetime.strptime(datetime_end_str, '%d/%m/%Y %H:%M:%S')
 
-        tmp_db = db_project_df.loc[db_project_df['Transaction time'] <= datetime_transaction_obj]
+        tmp_db = self.db_project_df.loc[self.db_project_df['Transaction time'] <= datetime_transaction_obj]
         tmp_db = tmp_db.loc[(tmp_db['Valid start time'] >= datetime_start_obj) &
                                    (tmp_db['Valid stop time'] <= datetime_end_obj)]
         tmp_db = tmp_db.loc[(tmp_db['LOINC-NUM'] == logic_num) & (tmp_db['First name'] == first_name) &
