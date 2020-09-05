@@ -61,22 +61,23 @@ while(run):
         logic_num = input('Enter logic_num:')
         first_name = input('Enter first_name:')
         last_name = input('Enter last_name:')
-        transac_date = input('Enter current date (optional):')
-        if transac_date == '':
-            transac_date = date
-        transac_time = input('Enter current time (optional):')
-        if transac_time == '':
-            transac_time = None
-        start_date = input('Enter start date:')
-        start_time = input('Enter start time (optional):')
-        if start_time == '':
-            start_time = None
-        end_date = input('Enter end date:')
-        end_time = input('Enter end time (optional):')
-        if end_time == '':
-            end_time = None
-        ans = merge_c.history(logic_num, first_name, last_name,transac_date,transac_time, start_date, end_date, start_time, end_time)
-        print(ans.to_string())
+        valid_start_date = input('Enter valid start date:')
+        valid_start_time = input('Enter valid start time (optional):')
+        if valid_start_time == '':
+            valid_start_time = None
+        trans_start_date = input('Enter trans start date:')
+        trans_start_time = input('Enter trans start time (optional):')
+        if trans_start_time == '':
+            trans_start_time = None
+        trans_end_date = input('Enter trans end date:')
+        trans_end_time = input('Enter trans end time (optional):')
+        if trans_end_time == '':
+            trans_end_time = None
+        ans = merge_c.history(logic_num, first_name, last_name,valid_start_date,valid_start_time, trans_start_date, trans_start_time, trans_end_date, trans_end_time)
+        if ans.empty:
+            print('There is no measurement that matches the publication of The query')
+        else:
+            print(ans.to_string())
 
 
     elif userInp == '4':
@@ -91,7 +92,7 @@ while(run):
         new_time = input('Enter new time (new Transaction time):')
         new_value = input('Enter new value:')
         ans = merge_c.update(update_date, update_time, comp_or_loinc_val, first_name, last_name, new_date, new_time, new_value)
-        if ans is None:
+        if ans.empty:
             print('There is no measurement that matches the publication of The query')
         else:
             print('The update was done')
@@ -109,7 +110,7 @@ while(run):
         if del_time == '':
             del_time = None
         ans = merge_c.delete(tran_date, tran_time, comp_or_loinc_val, first_name, last_name, del_date, del_time)
-        if ans is None:
+        if ans.empty:
             print('There is no measurement that matches the publication of The query')
         else:
             print('The update was done')

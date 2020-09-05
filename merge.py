@@ -83,7 +83,7 @@ class Merge():
 
 
 
-    def history(self, logic_num, first_name, last_name,transac_date,transac_time, start_date, end_date, start_time, end_time):
+    def history(self, logic_num, first_name, last_name,valid_start_date,valid_start_time, trans_start_date, trans_start_time, trans_end_date, trans_end_time):
         """
 
         :param logic_num:
@@ -97,27 +97,31 @@ class Merge():
         """
         import datetime as datetime
         # with time case
-        if transac_time is not None:
-            datetime_transaction_str = transac_date + " " + transac_time
-        # no transaction time
+        if valid_start_time is not None:
+            datetime_valid_start_str = valid_start_date + " " + valid_start_time
+            datetime_valid_start_obj = datetime.datetime.strptime(datetime_valid_start_str, '%d/%m/%Y %H:%M:%S')
+            datetime_valid_end_obj = datetime_valid_start_obj
         else:
-            datetime_transaction_str = transac_date + " " + "00:00:00"
-        datetime_transaction_obj = datetime.datetime.strptime(datetime_transaction_str, '%d/%m/%Y %H:%M:%S')
+            datetime_valid_start_str = valid_start_date + " " + "00:00:00"
+            datetime_valid_start_obj = datetime.datetime.strptime(datetime_valid_start_str, '%d/%m/%Y %H:%M:%S')
+            datetime_valid_end_str = valid_start_date + " " + "23:59:59"
+            datetime_valid_end_obj= datetime.datetime.strptime(datetime_valid_end_str, '%d/%m/%Y %H:%M:%S')
 
-        if start_time is None:
-            start_time = "00:00:01"
-        if end_time is None:
-            end_time = "23:59:00"
 
-        datetime_start_str = start_date + " " + start_time
-        datetime_end_str = end_date + " " + end_time
+        if trans_start_time is None:
+            trans_start_time = "00:00:01"
+        if trans_end_time is None:
+            trans_end_time = "23:59:59"
 
-        datetime_start_obj = datetime.datetime.strptime(datetime_start_str, '%d/%m/%Y %H:%M:%S')
-        datetime_end_obj = datetime.datetime.strptime(datetime_end_str, '%d/%m/%Y %H:%M:%S')
+        datetime_tarns_start_str = trans_start_date + " " + trans_start_time
+        datetime_trans_end_str = trans_end_date + " " + trans_end_time
 
-        tmp_db = self.db_project_df.loc[self.db_project_df['Transaction time'] <= datetime_transaction_obj]
-        tmp_db = tmp_db.loc[(tmp_db['Valid start time'] >= datetime_start_obj) &
-                                   (tmp_db['Valid stop time'] <= datetime_end_obj)]
+        datetime_trans_start_obj = datetime.datetime.strptime(datetime_tarns_start_str, '%d/%m/%Y %H:%M:%S')
+        datetime_trans_end_obj = datetime.datetime.strptime(datetime_trans_end_str, '%d/%m/%Y %H:%M:%S')
+
+        tmp_db = self.db_project_df.loc[(self.db_project_df['Transaction time'] <= datetime_trans_end_obj) & (self.db_project_df['Transaction time'] >= datetime_trans_start_obj)]
+        tmp_db = tmp_db.loc[(tmp_db['Valid start time'] >= datetime_valid_start_obj) &
+                                   (tmp_db['Valid start time'] <= datetime_valid_end_obj)]
         tmp_db = tmp_db.loc[(tmp_db['LOINC-NUM'] == logic_num) & (tmp_db['First name'] == first_name) &
                                    (tmp_db['Last name'] == last_name)]
         return tmp_db
