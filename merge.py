@@ -122,6 +122,7 @@ class Merge():
                                    (tmp_db['Last name'] == last_name)]
         return tmp_db
 
+
     def update(self, update_date, updat_time, comp_or_loinc_val, first_name, last_name, new_date, new_time, new_value):
         """
         :param update_date: the date we will update
